@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CraftForge AI | Ultimate Mod Combiner</title>
+    <style>
+        /* Matrix / Minecraft Dark Mode Style */
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-card: #121212;
+            --matrix-green: #00ff66;
+            --matrix-glow: rgba(0, 255, 102, 0.3);
+            --text-gray: #aaaaaa;
+            --border-color: #222222;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Subtle glowing background grid */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: 
+                linear-gradient(rgba(0, 255, 102, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 102, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+        }
+
+        header {
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 24px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .logo span {
+            color: var(--matrix-green);
+            text-shadow: 0 0 10px var(--matrix-glow);
+        }
+
+        .version-badge {
+            background: #1a1a1a;
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            color: var(--text-gray);
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Platform Selector Switch */
+        .platform-selector {
+            display: flex;
+            background: #151515;
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .platform-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-gray);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .platform-btn.active {
+            background: var(--matrix-green);
+            color: #000000;
+            box-shadow: 0 0 15px var(--matrix-glow);
+        }
+
+        /* Main Dropzone / Tool Container */
+        .combiner-container {
+            background: var(--bg-card);
+            border: 2px dashed #222;
+            width: 100%;
+            max-width: 700px;
+            border-radius: 20px;
+            padding: 40px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .combiner-container:hover {
+            border-color: var(--matrix-green);
+            box-shadow: 0 0 30px rgba(0, 255, 102, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 50px;
+            color: var(--matrix-green);
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--matrix-glow);
+        }
+
+        .combiner-container h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .combiner-container p {
+            color: var(--text-gray);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        /* File input style trick */
+        .file-input-label {
+            background: #1a1a1a;
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        .file-input-label:hover {
+            background: #222222;
+            border-color: #444444;
+        }
+
+        #mod-files {
+            display: none;
+        }
+
+        /* Action Button */
+        .merge-btn {
+            margin-top: 30px;
+            background: var(--matrix-green);
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .merge-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 102, 0.4);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #444444;
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">MINE<span>COMBINE</span></div>
+        <div class="version-badge">v2.4.0 Live</div>
+    </header>
+
+    <main>
+        <div class="hero">
+            <h1>Merge Your Minecraft Mods</h1>
+            <p>Upload multiple Java (.jar) or Bedrock (.mcpack) resource files to stitch them into a single, seamless package.</p>
+        </div>
+
+        <!-- Platform Toggle -->
+        <div class="platform-selector">
+            <button class="platform-btn active" onclick="setPlatform('java', this)">Java Edition</button>
+            <button class="platform-btn" onclick="setPlatform('bedrock', this)">Bedrock (PE/Win10)</button>
+        </div>
+
+        <!-- Dynamic Drag & Drop Tool Box -->
+        <div class="combiner-container" id="drop-zone">
+            <div class="upload-icon">⚡</div>
+            <h3 id="box-title">Drag & Drop Java Mods</h3>
+            <p id="box-desc">Select multiple .jar files or modpack folders to combine compatibility layers.</p>
+            
+            <label for="mod-files" class="file-input-label">Browse Files</label>
+            <input type="file" id="mod-files" multiple accept=".jar,.zip,.mcpack,.mcaddon">
+        </div>
+
+        <button class="merge-btn" onclick="startMerge()">Initialize Combination</button>
+    </main>
+
+    <footer>
+        Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.
+    </footer>
+
+    <script>
+        // Simple interactive script for visual swapping
+        let currentPlatform = 'java';
+
+        function setPlatform(platform, button) {
+            currentPlatform = platform;
+            
+            // Toggle active button style
+            document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            // Change instructions dynamically
+            const title = document.getElementById('box-title');
+            const desc = document.getElementById('box-desc');
+            const fileInput = document.getElementById('mod-files');
+
+            if(platform === 'java') {
+                title.innerText = "Drag & Drop Java Mods";
+                desc.innerText = "Select multiple .jar files or modpack folders to combine compatibility layers.";
+                fileInput.setAttribute('accept', '.jar,.zip');
+            } else {
+                title.innerText = "Drag & Drop Bedrock Packs";
+                desc.innerText = "Select .mcpack or .mcaddon files to instantly merge behavior & resource systems.";
+                fileInput.setAttribute('accept', '.mcpack,.mcaddon,.zip');
+            }
+        }
+
+        function startMerge() {
+            alert("Ready to compile! (Add your backend scripts or link your tool to complete the processing engine).");
+        }
+    </script>
+</body>
+</html>
